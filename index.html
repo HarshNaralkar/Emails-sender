@@ -144,7 +144,7 @@
           failedEmails++;
 
           if (sentEmails + failedEmails === emails.length) {
-            hideLoaderShowSuccess(sentEmails, failedEmails);
+            hideLoaderShowSuccess(sentEmails, failedEmails, "❌ Network error: " + error.message);
           }
         });
       });
@@ -162,14 +162,15 @@
       document.getElementById('popupMessage').style.display = 'block';
     }
 
-    function hideLoaderShowSuccess(sentEmails, failedEmails) {
-      document.querySelector('.loader').style.display = 'none';
-      document.getElementById('popupText').innerText = 
-        sentEmails > 0 
-          ? `✅ ${sentEmails} email sent successfully.  ${failedEmails} email failed.` 
-          : "❌ All email attempts failed.";
-      document.getElementById('popupMessage').style.display = 'block';
-    }
+    function hideLoaderShowSuccess(sentEmails, failedEmails, debugMessages = "") {
+    document.querySelector('.loader').style.display = 'none';
+    document.getElementById('popupText').innerHTML = 
+        (sentEmails > 0 
+            ? `✅ ${sentEmails} email(s) sent successfully.  ${failedEmails} email(s) failed.<br>` 
+            : "❌ All email attempts failed.<br>") 
+        + debugMessages;
+    document.getElementById('popupMessage').style.display = 'block';
+}
 
     function closePopup() {
       document.getElementById('overlay').style.display = 'none';
