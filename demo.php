@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response['messages'][] = "✅ Email sent successfully to $email";
         } catch (Exception $e) {
             $response['success'] = false;
+            echo e;
            $response['messages'][] = "❌ Could not send to $email. Mailer Error: {$mail->ErrorInfo}.";
             $response['messages'][] = "📋 Debug: Sender Email - $senderEmail, Subject - $emailSubject, Body - $emailBody";
 
