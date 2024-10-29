@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import os
+from datetime import datetime
 
 # CSS styling
 st.markdown("""
@@ -50,7 +51,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 st.title("📧 Interactive Email Sender with Individual Attachments")
 
 # Section for sender email and message details
@@ -66,9 +66,36 @@ with st.container():
             """,
             unsafe_allow_html=True
         )
+    col1 , col2 , col3 = st.columns(3)
+    with col3:
+        # Send Test Email button
+        test_send_button = st.button("📬 Send Test Email")
 
-    subject = st.text_input("Email Subject", placeholder="Enter the subject")
-    body = st.text_area("Message Body", placeholder="Type your message...")
+    # Function to send test email
+    def send_test_email(sender_email, password):
+        try:
+            # Email setup
+            message = MIMEMultipart()
+            message['From'] = sender_email
+            message['To'] = sender_email  # Send to self
+            message['Subject'] = "Test Email From Quick Mail Sender."
+            message.attach(MIMEText("This is a test email to verify your credentials.", 'plain'))
+
+            # SMTP server configuration and email sending
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                server.starttls()
+                server.login(sender_email, password)
+                server.sendmail(sender_email, sender_email, message.as_string())
+
+            st.success("✅ Email and password are working correctly! Test email sent successfully.")
+        except Exception as e:
+            st.error(f"❌ Failed to send test email: {e}")
+
+    if test_send_button:
+        send_test_email(sender_email, password)
+
+subject = st.text_input("Email Subject", placeholder="Enter the email subject")
+message_body = st.text_area("Message Body", placeholder="Type your message here...")
 
 # Table-like structure for recipient emails and file selection
 st.markdown("### 📋 Enter Recipients and Select Attachments")
@@ -143,7 +170,7 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
 # Handle email sending when button is clicked
 if submit_button:
     with st.spinner("⏳ Sending emails..."):
-        results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, body, attachments)
+        results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, message_body, attachments)
 
     # Display results
     with st.expander("📋 Email Sending Results"):
