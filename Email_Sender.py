@@ -62,8 +62,8 @@ with st.container():
     with st.expander("📹 Password Creation Guide"):
         st.markdown(
             """
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/ziABaAUq5Ck?si=mUWHKMrq3d8uJG_m" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            """,
+             <iframe width="560" height="315" src="https://www.youtube.com/embed/Ar340gxwhTs?si=F4p_ZvYtID4zVBim" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+             """,
             unsafe_allow_html=True
         )
     col1 , col2 , col3 = st.columns(3)
