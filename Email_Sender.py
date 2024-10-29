@@ -70,7 +70,7 @@ with st.container():
     with col3:
         # Send Test Email button
         test_send_button = st.button("📬 Send Test Email")
-
+    st.write("---")
     # Function to send test email
     def send_test_email(sender_email, password):
         try:
@@ -96,7 +96,7 @@ with st.container():
 
 subject = st.text_input("Email Subject", placeholder="Enter the email subject")
 message_body = st.text_area("Message Body", placeholder="Type your message here...")
-
+st.write("---")
 # Table-like structure for recipient emails and file selection
 st.markdown("### 📋 Enter Recipients and Select Attachments")
 
