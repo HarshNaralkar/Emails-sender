@@ -60,6 +60,17 @@ with st.container():
     password = st.text_input("Password", type="password", placeholder="Your password")
 
     with st.expander("📹 Password Creation Guide"):
+        st.write("""
+    1. **Go to your Google Account**: Visit [myaccount.google.com](https://myaccount.google.com/) and sign in. Click on the **Security** tab in the sidebar.
+    
+    2. **Set Up 2-Step Verification** (if not already enabled): Under "Signing in to Google," click **2-Step Verification** and follow the steps to enable it.
+    
+    3. **Find "App Passwords"**: After enabling 2-Step Verification, use the search bar to locate **App Passwords** and select it. You may need to re-enter your password.
+    
+    4. **Generate a New Password**: Choose the app and device you need, then click **Generate** to get a 16-character password.
+    
+    5. **Copy and Use**: Copy this password and use it to sign in to your app securely.
+    """)
         st.markdown(
             """
              <iframe width="560" height="315" src="https://www.youtube.com/embed/Ar340gxwhTs?si=F4p_ZvYtID4zVBim" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
