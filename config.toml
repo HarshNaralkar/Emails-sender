@@ -2,7 +2,7 @@
 headless = true
 
 [browser]
-gather_usage_status = false
+gather_usage_stats = false
 
 [theme]
-base = "dark"
+base = "dark" 
