@@ -1,120 +1,153 @@
 import streamlit as st
+import pandas as pd
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from typing import List
 import os
 
-# CSS styling for buttons and layout
+# CSS styling
 st.markdown("""
     <style>
+    .main-content {
+        padding: 30px;
+        background-color: #1e1e2e;
+        border-radius: 12px;
+        color: #ffffff;
+    }
+    .stExpander {
+        color: white; /* Default color */
+    }
+    .stExpander:hover {
+        color: green; /* Change color on hover */
+    }
     .stButton>button {
-        background-color: #4CAF50;
+        background-color: #246af7;
         color: white;
         border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
+        padding: 12px 24px;
+        font-size: 18px;
+        transition: color 0.3s ease; /* Smooth transition */
     }
     .stButton>button:hover {
-        background-color: #45a049;
+        color: #00ff00; /* Change text color to green on hover */
     }
-    .main-content {
-        padding: 20px;
-        background-color: #f4f4f9;
-        border-radius: 8px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    .recipient-table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
     }
+    .recipient-table th, .recipient-table td {
+        padding: 10px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
+    .recipient-table input, .recipient-table .stFileUploader {
+        width: 100%;
+        font-size: 14px;
+    }        
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📧 Send Email with Specific Attachments")
 
-# Email form inputs
-with st.form("email_form"):
-    st.markdown("## Enter Email Details")
-    sender_email = st.text_input("Your Email")
-    password = st.text_input("Password", type="password")
-    subject = st.text_input("Subject")
-    body = st.text_area("Message Body")
+st.title("📧 Interactive Email Sender with Individual Attachments")
 
-    email_list = st.text_area("Enter recipient emails, each on a new line", placeholder="example1@gmail.com\nexample2@gmail.com")
+# Section for sender email and message details
+with st.container():
+    st.markdown("### 📝 Fill in the Email Details")
+    sender_email = st.text_input("Your Email", placeholder="you@example.com")
+    password = st.text_input("Password", type="password", placeholder="Your password")
 
-    attachments = st.file_uploader("Upload all necessary files (up to 1 GB total)", accept_multiple_files=True, type=["pdf", "jpg", "png", "docx"])
-    submit_button = st.form_submit_button("Send Emails")
+    with st.expander("📹 Password Creation Guide"):
+        st.markdown(
+            """
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/ziABaAUq5Ck?si=mUWHKMrq3d8uJG_m" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            """,
+            unsafe_allow_html=True
+        )
 
-def send_emails(sender_email: str, password: str, emails: List[str], subject: str, body: str, attachments):
-    success_count = 0
-    failure_count = 0
+    subject = st.text_input("Email Subject", placeholder="Enter the subject")
+    body = st.text_area("Message Body", placeholder="Type your message...")
+
+# Table-like structure for recipient emails and file selection
+st.markdown("### 📋 Enter Recipients and Select Attachments")
+
+# User-defined number of rows for recipient email and file attachment entries
+num_recipients = st.number_input("Number of Recipients", min_value=1, step=1, value=1)
+
+# Creating two lists to store recipient emails and attachments
+recipient_emails = []
+attachments = []
+
+# Create table structure
+st.markdown("<table class='recipient-table'><tr><th>Recipient Email</th><th>Attachment(s)</th></tr>", unsafe_allow_html=True)
+for i in range(num_recipients):
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        email = st.text_input(f"Recipient Email {i+1}", key=f"email_{i}", placeholder="Recipient email")
+        recipient_emails.append(email)
+    with col2:
+        file = st.file_uploader(f"Attachment {i+1}", key=f"file_{i}", type=["pdf", "jpg", "png", "docx"], accept_multiple_files=True)
+        attachments.append(file)
+st.markdown("</table>", unsafe_allow_html=True)
+
+# Send Emails button
+submit_button = st.button("📨 Send Emails")
+
+# Function to send emails
+def send_emails(sender_email, password, recipient_emails, subject, body, attachments):
+    success_count, failure_count = 0, 0
     results = []
 
-    # Check total attachment size
-    total_size = sum([file.size for file in attachments])
-    max_size = 1 * 1024 * 1024 * 1024  # 1 GB limit
-    if total_size > max_size:
-        st.error(f"Total attachment size exceeds 1 GB limit. Total: {total_size / (1024 * 1024):.2f} MB")
-        return [], 0, len(emails)
+    for email, attachment_files in zip(recipient_emails, attachments):
+        if not email:
+            st.warning("Please enter all recipient emails.")
+            return results, success_count, failure_count
+        if not attachment_files:
+            st.warning("Please attach files for all recipients.")
+            return results, success_count, failure_count
 
-    # Organize files by their names (without extension)
-    files_dict = {os.path.splitext(file.name)[0]: file for file in attachments}
+        try:
+            # Email setup
+            message = MIMEMultipart()
+            message['From'] = sender_email
+            message['To'] = email
+            message['Subject'] = subject
+            message.attach(MIMEText(body, 'plain'))
 
-    # Process each recipient
-    for email in emails:
-        email_with_prefix = email.strip()  # Full email including domain
-        email_prefix = email_with_prefix.split('@')[0]  # Extract prefix from email
-
-        # Check if the full email name matches any of the file names (excluding extension)
-        if email_with_prefix in files_dict:
-            try:
-                # Email setup
-                message = MIMEMultipart()
-                message['From'] = sender_email
-                message['To'] = email_with_prefix
-                message['Subject'] = subject
-                message.attach(MIMEText(body, 'plain'))
-
-                # Attach the specific file for this email
-                file = files_dict[email_with_prefix]
-                file.seek(0)  # Reset file pointer
+            # Attach multiple files
+            for attachment_file in attachment_files:
+                attachment_file.seek(0)
                 part = MIMEBase('application', 'octet-stream')
-                part.set_payload(file.read())
+                part.set_payload(attachment_file.read())
                 encoders.encode_base64(part)
-                part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(file.name)}')
+                part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(attachment_file.name)}')
                 message.attach(part)
 
-                # Connect to SMTP server and send email
-                with smtplib.SMTP('smtp.gmail.com', 587) as server:
-                    server.starttls()
-                    server.login(sender_email, password)
-                    server.sendmail(sender_email, email_with_prefix, message.as_string())
+            # SMTP server configuration and email sending
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                server.starttls()
+                server.login(sender_email, password)
+                server.sendmail(sender_email, email, message.as_string())
 
-                results.append(f"✅ Email sent successfully to {email_with_prefix}")
-                success_count += 1
+            results.append(f"✅ Email sent successfully to {email}")
+            success_count += 1
 
-            except Exception as e:
-                results.append(f"❌ Failed to send email to {email_with_prefix}: {e}")
-                failure_count += 1
-        else:
-            results.append(f"❌ No attachment found for {email_with_prefix} matching filename '{email_with_prefix}'")
+        except Exception as e:
+            results.append(f"❌ Failed to send email to {email}: {e}")
             failure_count += 1
 
     return results, success_count, failure_count
 
-# Send email on form submission
+# Handle email sending when button is clicked
 if submit_button:
-    # Parse emails into a list
-    emails = [email.strip() for email in email_list.splitlines() if email.strip()]
+    with st.spinner("⏳ Sending emails..."):
+        results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, body, attachments)
 
-    # Show loading spinner
-    with st.spinner("Sending emails..."):
-        results, success_count, failure_count = send_emails(sender_email, password, emails, subject, body, attachments)
-
-    # Display results in an expander
-    with st.expander("Email Sending Results"):
+    # Display results
+    with st.expander("📋 Email Sending Results"):
         for result in results:
             st.write(result)
-        st.write(f"✅ {success_count} emails sent successfully. ❌ {failure_count} emails failed.")
+        st.write(f"✅ {success_count} emails sent successfully.")
+        st.write(f"❌ {failure_count} emails failed.")
