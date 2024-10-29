@@ -51,7 +51,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("📧 Interactive Email Sender with Individual Attachments")
+st.title("📧 Dynamic Email Sender with Individualized Attachments")
 
 # Section for sender email and message details
 with st.container():
