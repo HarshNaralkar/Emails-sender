@@ -8,6 +8,15 @@ from email import encoders
 import os
 from datetime import datetime
 
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # CSS styling
 st.markdown("""
     <style>
@@ -53,7 +62,7 @@ st.markdown("""
 
 st.title("📧 Dynamic Email Sender with Individualized Attachments")
 
-# Section for sender email and message details
+
 with st.container():
     st.markdown("### 📝 Fill in the Email Details")
     sender_email = st.text_input("Your Email", placeholder="you@example.com")
@@ -88,11 +97,11 @@ with st.container():
             # Email setup
             message = MIMEMultipart()
             message['From'] = sender_email
-            message['To'] = sender_email  # Send to self
+            message['To'] = sender_email 
             message['Subject'] = "Test Email From Quick Mail Sender."
             message.attach(MIMEText("This is a test email to verify your credentials.", 'plain'))
 
-            # SMTP server configuration and email sending
+            
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(sender_email, password)
@@ -108,17 +117,15 @@ with st.container():
 subject = st.text_input("Email Subject", placeholder="Enter the email subject")
 message_body = st.text_area("Message Body", placeholder="Type your message here...")
 st.write("---")
-# Table-like structure for recipient emails and file selection
+
 st.markdown("### 📋 Enter Recipients and Select Attachments")
 
-# User-defined number of rows for recipient email and file attachment entries
 num_recipients = st.number_input("Number of Recipients", min_value=1, step=1, value=1)
 
-# Creating two lists to store recipient emails and attachments
 recipient_emails = []
 attachments = []
 
-# Create table structure
+
 st.markdown("<table class='recipient-table'><tr><th>Recipient Email</th><th>Attachment(s)</th></tr>", unsafe_allow_html=True)
 for i in range(num_recipients):
     col1, col2 = st.columns([3, 2])
@@ -130,10 +137,8 @@ for i in range(num_recipients):
         attachments.append(file)
 st.markdown("</table>", unsafe_allow_html=True)
 
-# Send Emails button
 submit_button = st.button("📨 Send Emails")
 
-# Function to send emails
 def send_emails(sender_email, password, recipient_emails, subject, body, attachments):
     success_count, failure_count = 0, 0
     results = []
@@ -147,14 +152,14 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
             return results, success_count, failure_count
 
         try:
-            # Email setup
+            
             message = MIMEMultipart()
             message['From'] = sender_email
             message['To'] = email
             message['Subject'] = subject
             message.attach(MIMEText(body, 'plain'))
 
-            # Attach multiple files
+            
             for attachment_file in attachment_files:
                 attachment_file.seek(0)
                 part = MIMEBase('application', 'octet-stream')
@@ -163,7 +168,7 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
                 part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(attachment_file.name)}')
                 message.attach(part)
 
-            # SMTP server configuration and email sending
+            
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(sender_email, password)
@@ -178,12 +183,11 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
 
     return results, success_count, failure_count
 
-# Handle email sending when button is clicked
 if submit_button:
     with st.spinner("⏳ Sending emails..."):
         results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, message_body, attachments)
 
-    # Display results
+   
     with st.expander("📋 Email Sending Results"):
         for result in results:
             st.write(result)
