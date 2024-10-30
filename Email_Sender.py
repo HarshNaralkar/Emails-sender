@@ -8,6 +8,10 @@ from email import encoders
 import os
 from datetime import datetime
 
+st.set_page_config(
+    page_title="Quick Mail Sender",  
+    page_icon="📬" 
+)
 hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -82,8 +86,32 @@ with st.container():
     """)
         st.markdown(
             """
-            <iframe width="315" height="560" src="https://youtube.com/embed/eM0HUjm0Pdg?rel=0&playlist=eM0HUjm0Pdg&loop=1&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-             """,
+            <style>
+                .video-container {
+                    position: relative;
+                    width: 100%;
+                    padding-bottom: 80%; /* Aspect ratio for 315x560 */
+                    height: 0%;
+                    overflow: hidden;
+                }
+                
+                .video-container iframe {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+            </style>
+
+            <div class="video-container">
+                <iframe src="https://youtube.com/embed/eM0HUjm0Pdg?rel=0&playlist=eM0HUjm0Pdg&loop=1&autoplay=1" 
+                        title="YouTube video player" frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
+                </iframe>
+            </div>
+            """,
             unsafe_allow_html=True
         )
     col1 , col2 , col3 = st.columns(3)
