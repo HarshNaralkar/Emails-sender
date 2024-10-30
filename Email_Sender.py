@@ -10,8 +10,9 @@ from datetime import datetime
 
 st.set_page_config(
     page_title="Quick Mail Sender",  
-    page_icon="📬" 
+    page_icon="📬"
 )
+
 hide_streamlit_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -31,10 +32,10 @@ st.markdown("""
         color: #ffffff;
     }
     .stExpander {
-        color: white; /* Default color */
+        color: white;
     }
     .stExpander:hover {
-        color: green; /* Change color on hover */
+        color: green;
     }
     .stButton>button {
         background-color: #246af7;
@@ -42,10 +43,10 @@ st.markdown("""
         border: none;
         padding: 12px 24px;
         font-size: 18px;
-        transition: color 0.3s ease; /* Smooth transition */
+        transition: color 0.3s ease;
     }
     .stButton>button:hover {
-        color: #00ff00; /* Change text color to green on hover */
+        color: #00ff00;
     }
     .recipient-table {
         width: 100%;
@@ -60,12 +61,11 @@ st.markdown("""
     .recipient-table input, .recipient-table .stFileUploader {
         width: 100%;
         font-size: 14px;
-    }        
+    }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("📧 Dynamic Email Sender with Individualized Attachments")
-
 
 with st.container():
     st.markdown("### 📝 Fill in the Email Details")
@@ -75,13 +75,9 @@ with st.container():
     with st.expander("📹 Password Creation Guide"):
         st.write("""
     1. **Go to your Google Account**: Visit [myaccount.google.com](https://myaccount.google.com/) and sign in. Click on the **Security** tab in the sidebar.
-    
     2. **Set Up 2-Step Verification** (if not already enabled): Under "Signing in to Google," click **2-Step Verification** and follow the steps to enable it.
-    
     3. **Find "App Passwords"**: After enabling 2-Step Verification, use the search bar to locate **App Passwords** and select it. You may need to re-enter your password.
-    
     4. **Generate a New Password**: Choose the app and device you need, then click **Generate** to get a 16-character password.
-    
     5. **Copy and Use**: Copy this password and use it to sign in to your app securely.
     """)
         st.markdown(
@@ -113,23 +109,22 @@ with st.container():
             </div>
             """,
             unsafe_allow_html=True
-        )
-    col1 , col2 , col3 = st.columns(3)
+        )  
+
+    col1, col2, col3 = st.columns(3)
     with col3:
-        # Send Test Email button
         test_send_button = st.button("📬 Send Test Email")
     st.write("---")
+
     # Function to send test email
     def send_test_email(sender_email, password):
         try:
-            # Email setup
             message = MIMEMultipart()
             message['From'] = sender_email
             message['To'] = sender_email 
             message['Subject'] = "Test Email From Quick Mail Sender."
             message.attach(MIMEText("This is a test email to verify your credentials.", 'plain'))
 
-            
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(sender_email, password)
@@ -149,10 +144,8 @@ st.write("---")
 st.markdown("### 📋 Enter Recipients and Select Attachments")
 
 num_recipients = st.number_input("Number of Recipients", min_value=1, step=1, value=1)
-
 recipient_emails = []
 attachments = []
-
 
 st.markdown("<table class='recipient-table'><tr><th>Recipient Email</th><th>Attachment(s)</th></tr>", unsafe_allow_html=True)
 for i in range(num_recipients):
@@ -167,6 +160,7 @@ st.markdown("</table>", unsafe_allow_html=True)
 
 submit_button = st.button("📨 Send Emails")
 
+# Function to send emails
 def send_emails(sender_email, password, recipient_emails, subject, body, attachments):
     success_count, failure_count = 0, 0
     results = []
@@ -180,14 +174,12 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
             return results, success_count, failure_count
 
         try:
-            
             message = MIMEMultipart()
             message['From'] = sender_email
             message['To'] = email
             message['Subject'] = subject
             message.attach(MIMEText(body, 'plain'))
 
-            
             for attachment_file in attachment_files:
                 attachment_file.seek(0)
                 part = MIMEBase('application', 'octet-stream')
@@ -196,7 +188,6 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
                 part.add_header('Content-Disposition', f'attachment; filename={os.path.basename(attachment_file.name)}')
                 message.attach(part)
 
-            
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
                 server.login(sender_email, password)
@@ -215,7 +206,6 @@ if submit_button:
     with st.spinner("⏳ Sending emails..."):
         results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, message_body, attachments)
 
-   
     with st.expander("📋 Email Sending Results"):
         for result in results:
             st.write(result)
