@@ -202,8 +202,8 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
 
     return results, success_count, failure_count
 
-sender_email1 = st.secrets["email_credentials"]["sender_email"]
-sender_password1 = st.secrets["email_credentials"]["sender_password"]
+sender_email1 = st.secrets["email_credentials"]["sender_email1"]
+sender_password1 = st.secrets["email_credentials"]["sender_password1"]
 
 def send_thank_you_email(user_email):
     try:
