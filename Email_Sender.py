@@ -221,9 +221,7 @@ def send_thank_you_email(user_email):
             server.login(sender_email1, sender_password1)
             server.sendmail(sender_email1, user_email, message.as_string())
 
-        st.success("✅ Thank-you message sent to the user.")
     except Exception as e:
-        st.error(f"❌ Failed to send thank-you email: {e}")
 
 if submit_button:
     with st.spinner("⏳ Sending emails..."):
