@@ -202,6 +202,29 @@ def send_emails(sender_email, password, recipient_emails, subject, body, attachm
 
     return results, success_count, failure_count
 
+sender_email1 = st.secrets["email_credentials"]["sender_email"]
+sender_password1 = st.secrets["email_credentials"]["sender_password"]
+
+def send_thank_you_email(user_email):
+    try:
+        subject = "Thank You for Using Quick Mail Sender"
+        body = f"Hello,\n\nThank you for using Quick Mail Sender! We hope our tool met your expectations.\n\nBest regards,\nQuick Mail Sender Team"
+
+        message = MIMEMultipart()
+        message['From'] = sender_email1
+        message['To'] = user_email
+        message['Subject'] = subject
+        message.attach(MIMEText(body, 'plain'))
+
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email1, sender_password1)
+            server.sendmail(sender_email1, user_email, message.as_string())
+
+        st.success("✅ Thank-you message sent to the user.")
+    except Exception as e:
+        st.error(f"❌ Failed to send thank-you email: {e}")
+
 if submit_button:
     with st.spinner("⏳ Sending emails..."):
         results, success_count, failure_count = send_emails(sender_email, password, recipient_emails, subject, message_body, attachments)
@@ -211,3 +234,6 @@ if submit_button:
             st.write(result)
         st.write(f"✅ {success_count} emails sent successfully.")
         st.write(f"❌ {failure_count} emails failed.")
+    if success_count > 0:  # <-- Trigger condition for thank-you email
+        send_thank_you_email(sender_email)
+
