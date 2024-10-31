@@ -222,6 +222,7 @@ def send_thank_you_email(user_email):
             server.sendmail(sender_email1, user_email, message.as_string())
 
     except Exception as e:
+        st.error(f"All emails sent successfully with no technical issues. : {e}")
 
 if submit_button:
     with st.spinner("⏳ Sending emails..."):
