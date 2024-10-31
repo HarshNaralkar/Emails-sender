@@ -38,15 +38,29 @@ st.markdown("""
         color: green;
     }
     .stButton>button {
-        background-color: #ffde21;
-        color: black;
-        border: none;
-        padding: 12px 24px;
-        font-size: 18px;
-        transition: color 0.3s ease;
+        padding: 10px 20px;
+        text-transform: uppercase;
+        border-radius: 8px;
+        font-size: 17px;
+        font-weight: 500;
+        color: white;
+        text-shadow: none;
+        background: transparent;
+        cursor: pointer;
+        box-shadow: transparent;
+        border: 1px solid #ffffff80;
+        transition: 0.5s ease;
+        user-select: none;
     }
-    .stButton>button:hover {
-        color: #00ff00;
+
+    .stButton>button:hover,
+    .stButton>button:focus {
+        color: #ffffff;
+        background: #008cff;
+        border: 1px solid #008cff;
+        text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 20px #ffffff;
+        box-shadow: 0 0 5px #008cff, 0 0 20px #008cff, 0 0 50px #008cff,
+                    0 0 100px #008cff;
     }
     .recipient-table {
         width: 100%;
